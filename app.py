@@ -16,32 +16,55 @@ from services.conversation_manager import ConversationManager
 from services.llm_service import LLMService
 
 
-def load_conversations() -> Dict[str, Any]:
+def load_conversations(llm_service) -> Dict[str, Any]:
     """Load conversations from disk if they exist."""
     conversations_file = Path(Config.DATA_DIR) / "conversations.json"
     
-    if conversations_file.exists():
-        try:
-            with open(conversations_file, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                # Convert back to conversation managers
-                for conv_id, conv_data in data.items():
-                    # Recreate LLM service and conversation manager
-                    conv_data["conversation_manager"] = ConversationManager(st.session_state.llm_service)
-                    # Restore state from saved data
-                    if "candidate_data" in conv_data:
-                        conv_data["conversation_manager"].candidate_data = conv_data["candidate_data"]
-                    if "state" in conv_data:
-                        conv_data["conversation_manager"].state = conv_data["state"]
-                return data
-        except (json.JSONDecodeError, Exception) as e:
-            print(f"Error loading conversations: {e}")
-            return {}
-    return {}
+    if not conversations_file.exists():
+        return {}
+    
+    try:
+        with open(conversations_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            
+        # Reconstruct conversations with managers
+        loaded_convs = {}
+        for conv_id, conv_data in data.items():
+            # Create new conversation manager
+            manager = ConversationManager(llm_service)
+            
+            # Restore state
+            if "candidate_data" in conv_data:
+                manager.candidate_data = conv_data["candidate_data"]
+            
+            if "state" in conv_data:
+                # Convert string state back to enum
+                from services.conversation_manager import ConversationState
+                state_value = conv_data["state"]
+                manager.state = ConversationState(state_value)
+            
+            # Build conversation object
+            loaded_convs[conv_id] = {
+                "id": conv_data["id"],
+                "messages": conv_data["messages"],
+                "created_at": conv_data["created_at"],
+                "title": conv_data["title"],
+                "awaiting_input": conv_data.get("awaiting_input", True),
+                "conversation_manager": manager
+            }
+        
+        return loaded_convs
+        
+    except Exception as e:
+        print(f"Error loading conversations: {e}")
+        return {}
 
 
 def save_conversations() -> None:
     """Save current conversations to disk."""
+    if "conversations" not in st.session_state:
+        return
+    
     conversations_file = Path(Config.DATA_DIR) / "conversations.json"
     
     # Prepare data for serialization
@@ -67,12 +90,13 @@ def save_conversations() -> None:
 
 def initialize_session_state() -> None:
     """Initialize Streamlit session state variables."""
+    # Initialize LLM service FIRST
     if "llm_service" not in st.session_state:
         st.session_state.llm_service = LLMService(api_key=Config.GROQ_API_KEY)
     
+    # Then load conversations with the LLM service
     if "conversations" not in st.session_state:
-        # Try to load from disk first
-        st.session_state.conversations = load_conversations()
+        st.session_state.conversations = load_conversations(st.session_state.llm_service)
     
     if "current_conversation_id" not in st.session_state:
         st.session_state.current_conversation_id = None
@@ -186,6 +210,9 @@ def handle_user_input(user_message: str) -> None:
     with st.chat_message("assistant"):
         st.markdown(response)
     conv["messages"].append({"role": "assistant", "content": response})
+    
+    # Save conversations after every message
+    save_conversations()
 
 
 def handle_exit() -> None:
@@ -215,6 +242,9 @@ def handle_exit() -> None:
     
     # Disable further input
     conv["awaiting_input"] = False
+    
+    # Save final state
+    save_conversations()
 
 
 def save_candidate_data(candidate_data: Dict[str, Any]) -> None:
