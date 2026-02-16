@@ -1,12 +1,12 @@
 # TalentScout AI - Hiring Assistant Chatbot
 
-An intelligent chatbot that streamlines the candidate screening process by collecting structured information and generating personalized technical interview questions.
+I built an AI chatbot that helps automate the initial stages of hiring for technical roles. Instead of asking candidates to fill out boring forms, it has a natural conversation with them and generates personalized interview questions based on their skills.
 
 ---
 
 ## What Does It Do?
 
-TalentScout automates the initial stages of technical recruitment. Instead of manually collecting candidate information through forms or emails, this chatbot conducts a natural conversation to gather everything you need:
+The main idea is simple: automate the tedious parts of technical recruitment. Here's what the chatbot does:
 
 - Candidate's contact information and background
 - Technical expertise and experience level
@@ -110,11 +110,11 @@ app.py                  # UI layer - handles Streamlit interface
     └── candidates.json            # Local storage for candidate data
 ```
 
-**Why this structure?**
-- Easy to update prompts without touching code
-- Swap AI providers by only changing the service layer
-- Validators are reusable across projects
-- Configuration changes don't require code edits
+**Why I organized it this way:**
+- Makes it easy to update prompts without touching the code
+- Can swap AI providers by only changing the service layer
+- Validators can be reused in other projects
+- All settings are in one place for easy adjustments
 
 ---
 
