@@ -67,6 +67,9 @@ def save_conversations() -> None:
     
     conversations_file = Path(Config.DATA_DIR) / "conversations.json"
     
+    # Ensure data directory exists
+    conversations_file.parent.mkdir(parents=True, exist_ok=True)
+    
     # Prepare data for serialization
     serializable_convs = {}
     for conv_id, conv_data in st.session_state.conversations.items():
@@ -250,6 +253,9 @@ def handle_exit() -> None:
 def save_candidate_data(candidate_data: Dict[str, Any]) -> None:
     """Persist candidate data to local JSON storage."""
     data_file = Path(Config.DATA_FILE_PATH)
+    
+    # Ensure data directory exists
+    data_file.parent.mkdir(parents=True, exist_ok=True)
     
     # Load existing data
     existing_data = []
