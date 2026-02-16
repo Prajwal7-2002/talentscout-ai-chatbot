@@ -1,0 +1,1 @@
+"""TalentScout Prompts Package"""
