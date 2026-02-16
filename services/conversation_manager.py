@@ -234,10 +234,31 @@ class ConversationManager:
     
     def _handle_completed_state(self, user_message: str) -> str:
         """Handle messages after information collection is complete."""
+        # Build context with candidate's actual information
+        context = f"""You are assisting a candidate who completed screening.
+Candidate's info:
+- Name: {self.candidate_data.get('name', 'Unknown')}
+- Desired Position: {self.candidate_data.get('position', 'Not specified')}
+- Experience: {self.candidate_data.get('experience', 'Not specified')} years
+- Location: {self.candidate_data.get('location', 'Not specified')}
+- Tech Stack: {self.candidate_data.get('tech_stack', 'Not specified')}
+
+CRITICAL RULES:
+- Reference their ACTUAL desired position: "{self.candidate_data.get('position', 'the role')}"
+- Do NOT make up job descriptions or details you don't know
+- If you lack specific info, say "Our hiring team will provide those details in your interview"
+- Stay focused on recruitment process, company culture questions only
+"""
+        
+        # Prepend context to conversation history
+        messages_with_context = [
+            {"role": "system", "content": context}
+        ] + self.conversation_history[-6:]
+        
         response = self.llm_service.generate_response(
             system_prompt=SYSTEM_PROMPT,
             user_message=user_message,
-            conversation_history=self.conversation_history[-6:]
+            conversation_history=messages_with_context
         )
         
         self.conversation_history.append({"role": "user", "content": user_message})
