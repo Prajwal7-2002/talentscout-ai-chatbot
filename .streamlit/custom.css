@@ -1,0 +1,76 @@
+/* TalentScout AI - Custom Styling */
+
+/* Main container */
+.main {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+/* Chat messages */
+.stChatMessage {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+/* User messages */
+.stChatMessage[data-testid="user-message"] {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+/* Assistant messages */
+.stChatMessage[data-testid="assistant-message"] {
+    background-color: #ffffff;
+    border-left: 4px solid #667eea;
+}
+
+/* Sidebar */
+.css-1d391kg {
+    background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+}
+
+/* Headers */
+h1 {
+    color: #2c3e50;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Input box */
+.stTextInput input {
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+    padding: 12px;
+    transition: all 0.3s ease;
+}
+
+.stTextInput input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Buttons */
+.stButton button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-weight: 600;
+    transition: transform 0.2s ease;
+}
+
+.stButton button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* Loading spinner */
+.stSpinner > div {
+    border-color: #667eea transparent transparent transparent;
+}
