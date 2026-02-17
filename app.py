@@ -16,6 +16,17 @@ from services.conversation_manager import ConversationManager
 from services.llm_service import LLMService
 
 
+# Load custom CSS for professional styling
+def load_custom_css():
+    """Inject custom CSS for enhanced UI."""
+    css_file = Path(".streamlit/custom.css")
+    if css_file.exists():
+        with open(css_file) as f:
+            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+load_custom_css()
+
+
 def load_conversations(llm_service) -> Dict[str, Any]:
     """Load conversations from disk if they exist."""
     conversations_file = Path(Config.DATA_DIR) / "conversations.json"
