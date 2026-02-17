@@ -16,15 +16,13 @@ from services.conversation_manager import ConversationManager
 from services.llm_service import LLMService
 
 
-# Load custom CSS for professional styling
+# Custom CSS loading function (called after set_page_config)
 def load_custom_css():
     """Inject custom CSS for enhanced UI."""
     css_file = Path(".streamlit/custom.css")
     if css_file.exists():
         with open(css_file) as f:
             st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-
-load_custom_css()
 
 
 def load_conversations(llm_service) -> Dict[str, Any]:
@@ -300,13 +298,16 @@ def initialize_conversation() -> None:
 
 def main() -> None:
     """Main application entry point."""
-    # Page configuration
+    # Page configuration (MUST be first Streamlit command)
     st.set_page_config(
         page_title="TalentScout AI | Hiring Assistant",
         page_icon="🎯",
         layout="wide",
         initial_sidebar_state="expanded"
     )
+    
+    # Load custom CSS after page config
+    load_custom_css()
     
     # Initialize session state
     initialize_session_state()
