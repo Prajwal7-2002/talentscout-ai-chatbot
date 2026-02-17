@@ -167,17 +167,42 @@ def render_sidebar() -> None:
                 title = conv_data["title"]
                 is_current = conv_id == st.session_state.current_conversation_id
                 
-                # Highlight current conversation
-                button_label = f"{'> ' if is_current else ''}{title}"
+                # Create columns for conversation button and delete button
+                col1, col2 = st.columns([4, 1])
                 
-                if st.button(
-                    button_label,
-                    key=f"conv_{conv_id}",
-                    use_container_width=True,
-                    type="primary" if is_current else "secondary"
-                ):
-                    st.session_state.current_conversation_id = conv_id
-                    st.rerun()
+                with col1:
+                    # Highlight current conversation
+                    button_label = f"{'> ' if is_current else ''}{title}"
+                    
+                    if st.button(
+                        button_label,
+                        key=f"conv_{conv_id}",
+                        use_container_width=True,
+                        type="primary" if is_current else "secondary"
+                    ):
+                        st.session_state.current_conversation_id = conv_id
+                        st.rerun()
+                
+                with col2:
+                    # Delete button (only show if there's more than one conversation)
+                    if len(sorted_convs) > 1:
+                        if st.button("🗑️", key=f"delete_{conv_id}", help="Delete conversation"):
+                            # Delete the conversation
+                            del st.session_state.conversations[conv_id]
+                            
+                            # If we deleted the current conversation, switch to another one
+                            if conv_id == st.session_state.current_conversation_id:
+                                remaining = [cid for cid in st.session_state.conversations.keys() if cid != conv_id]
+                                if remaining:
+                                    st.session_state.current_conversation_id = remaining[0]
+                                else:
+                                    # Create new conversation if none left
+                                    new_id = create_new_conversation()
+                                    st.session_state.current_conversation_id = new_id
+                            
+                            # Save changes
+                            save_conversations()
+                            st.rerun()
         else:
             st.info("No conversations yet. Start chatting!")
         
@@ -186,6 +211,7 @@ def render_sidebar() -> None:
         # Stats
         total_convs = len(st.session_state.conversations)
         st.caption(f"Total Conversations: {total_convs}")
+
 
 
 def display_chat_history() -> None:
